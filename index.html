@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="دوري الخماسي">
+<meta name="theme-color" content="#0B1120">
+<link rel="manifest" id="manifestLink">
+<title>لائحة دوري الخماسي</title>
+<style>
+  :root{
+    --bg:#0B1120; --panel:#141C2E; --panel2:#1B2436; --line:#2A3550;
+    --gold:#FB7A1E; --white:#EAEFF9; --muted:#9AA7BD;
+    --green:#22C55E; --blue:#3B82F6; --yellow:#EAB308; --red:#EF4444;
+  }
+  *{box-sizing:border-box;}
+  body{background:var(--bg);color:var(--white);font-family:"Tahoma","Segoe UI",sans-serif;
+       direction:rtl;margin:0;padding:0;font-size:14px;}
+  .wrap{max-width:760px;margin:0 auto;padding:18px 16px 40px;}
+  h1{color:var(--gold);font-size:20px;text-align:center;margin:4px 0 16px;letter-spacing:.3px;}
+  .tabs{display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
+  .tab{flex:1;min-width:78px;background:var(--panel);border:1px solid var(--line);color:var(--muted);
+       padding:11px 4px;border-radius:10px;text-align:center;cursor:pointer;font-size:12.5px;font-weight:bold;
+       transition:.15s;display:flex;flex-direction:column;align-items:center;gap:3px;}
+  .tab .ic{font-size:17px;}
+  .tab.active{background:var(--gold);color:#0B1120;border-color:var(--gold);box-shadow:0 3px 10px rgba(245,180,0,.25);}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:12px;
+        box-shadow:0 2px 8px rgba(0,0,0,.25);}
+  .section-title{color:var(--gold);font-weight:bold;font-size:15px;margin:18px 0 10px;display:flex;align-items:center;gap:6px;}
+  .match-teams{display:flex;align-items:center;justify-content:center;gap:10px;font-weight:bold;font-size:13.5px;margin-bottom:8px;}
+  .match-teams span.dash{color:var(--muted);}
+  .score-row{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px;}
+  input[type=number]{width:50px;background:var(--panel2);border:1px solid var(--line);color:var(--white);
+       border-radius:6px;text-align:center;padding:6px 2px;font-size:15px;}
+  select,input[type=text]{background:var(--panel2);border:1px solid var(--line);color:var(--white);
+       border-radius:6px;padding:6px;font-size:13px;width:100%;}
+  .motm-row{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted);}
+  .motm-row select{flex:1;}
+  table{width:100%;border-collapse:collapse;font-size:12.5px;}
+  th{background:var(--gold);color:#0B1120;padding:7px 4px;text-align:center;}
+  td{padding:7px 4px;text-align:center;border-bottom:1px solid var(--line);}
+  tr:nth-child(even) td{background:var(--panel2);}
+  .badge{padding:2px 8px;border-radius:10px;font-size:11px;font-weight:bold;}
+  .badge.ok{background:rgba(34,197,94,.2);color:var(--green);}
+  .badge.warn{background:rgba(234,179,8,.2);color:var(--yellow);}
+  .badge.susp{background:rgba(239,68,68,.2);color:var(--red);}
+  .badge.neutral{background:var(--panel2);color:var(--muted);}
+  .att-row{display:flex;align-items:center;justify-content:space-between;padding:6px 4px;border-bottom:1px solid var(--line);}
+  .att-name{font-size:12.5px;color:var(--white);}
+  .att-btns{display:flex;gap:5px;}
+  .att-btn{border:1px solid var(--line);background:var(--panel2);color:var(--muted);
+       border-radius:6px;padding:4px 10px;font-size:11px;font-weight:bold;cursor:pointer;}
+  .att-btn.in.on{background:rgba(34,197,94,.25);color:var(--green);border-color:var(--green);}
+  .att-btn.out.on{background:rgba(239,68,68,.25);color:var(--red);border-color:var(--red);}
+  .att-summary{font-size:11px;color:var(--muted);text-align:center;margin-top:6px;}
+  .addform{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap;}
+  .addform>*{flex:1;min-width:90px;}
+  button.add{background:var(--gold);color:#0B1120;border:none;border-radius:6px;padding:7px 14px;
+       font-weight:bold;cursor:pointer;font-size:13px;flex:0 0 auto;}
+  .del{color:var(--red);cursor:pointer;font-weight:bold;}
+  .dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-left:4px;vertical-align:middle;}
+  .empty{color:var(--muted);text-align:center;padding:14px;font-size:12.5px;}
+  .pill{padding:1px 8px;border-radius:8px;font-size:11px;font-weight:bold;color:#0B1120;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div style="text-align:center;margin-bottom:6px;">
+  <svg width="96" height="113" viewBox="0 0 100 118" role="img" aria-label="شعار دوري كرة القدم الخماسية">
+    <defs>
+      <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#1B2436"/>
+        <stop offset="100%" stop-color="#0B1120"/>
+      </linearGradient>
+      <linearGradient id="trophyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" stop-color="#FDD35B"/>
+        <stop offset="100%" stop-color="#FB7A1E"/>
+      </linearGradient>
+    </defs>
+    <path d="M50,4 L88,16 L88,52 Q88,86 50,106 Q12,86 12,52 L12,16 Z"
+          fill="url(#shieldGrad)" stroke="url(#trophyGrad)" stroke-width="3"/>
+    <path d="M50,10 L82,20 L82,52 Q82,80 50,98 Q18,80 18,52 L18,20 Z"
+          fill="none" stroke="#2A3550" stroke-width="1"/>
+    <g fill="url(#trophyGrad)">
+      <path d="M38,26 L62,26 L59,44 Q50,53 41,44 Z"/>
+      <path d="M38,28 Q27,28 28,38 Q29,46 39,44" fill="none" stroke="url(#trophyGrad)" stroke-width="2.6" stroke-linecap="round"/>
+      <path d="M62,28 Q73,28 72,38 Q71,46 61,44" fill="none" stroke="url(#trophyGrad)" stroke-width="2.6" stroke-linecap="round"/>
+      <rect x="47" y="50" width="6" height="11" rx="1"/>
+      <rect x="37" y="61" width="26" height="5" rx="2"/>
+      <rect x="41" y="66" width="18" height="4" rx="1.5"/>
+    </g>
+    <text x="50" y="82" text-anchor="middle" font-size="8" font-weight="bold" fill="#EAEFF9" font-family="Tahoma">الدوري</text>
+    <text x="50" y="92" text-anchor="middle" font-size="8" font-weight="bold" fill="#EAEFF9" font-family="Tahoma">الخماسي</text>
+    <g>
+      <circle cx="32" cy="112" r="2.6" fill="#22C55E"/>
+      <circle cx="41" cy="112" r="2.6" fill="#3B82F6"/>
+      <circle cx="59" cy="112" r="2.6" fill="#EAB308"/>
+      <circle cx="68" cy="112" r="2.6" fill="#EF4444"/>
+    </g>
+  </svg>
+</div>
+<h1>دوري كرة القدم الخماسية</h1>
+<div style="text-align:center;color:var(--muted);font-size:10.5px;margin-bottom:4px;">
+  🟠 إصدار 24 — كل لاعب يسجّل حضوره وغيابه هو بس (بعد ما يحدد اسمه)
+</div>
+<div id="adminBar" style="text-align:center;margin-bottom:10px;font-size:12.5px;">
+  <span id="adminStatus" style="color:var(--muted)">👁️ وضع المشاهدة</span>
+  <span id="adminBtn" style="color:var(--gold);cursor:pointer;font-weight:bold;margin-right:8px;">🔒 دخول اللجنة</span>
+</div>
+<div id="backupBar" style="display:none;text-align:center;margin-bottom:12px;font-size:11.5px;">
+  <span id="exportBtn" style="color:var(--muted);cursor:pointer;text-decoration:underline;">⬇️ تنزيل نسخة احتياطية</span>
+  &nbsp;|&nbsp;
+  <span id="importBtn" style="color:var(--muted);cursor:pointer;text-decoration:underline;">⬆️ استيراد نسخة</span>
+  <input type="file" id="importFile" accept="application/json" style="display:none;">
+</div>
+
+<div id="loginModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);
+     z-index:50;align-items:center;justify-content:center;">
+  <div style="background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px;width:80%;max-width:280px;">
+    <div style="color:var(--gold);font-weight:bold;margin-bottom:10px;text-align:center;">🔒 دخول اللجنة</div>
+    <input type="password" id="loginInput" placeholder="كلمة السر" style="margin-bottom:8px;">
+    <div id="loginErr" style="color:var(--red);font-size:11.5px;display:none;margin-bottom:6px;">كلمة سر غلط</div>
+    <div style="display:flex;gap:6px;">
+      <button class="add" id="loginOk" style="flex:1;">دخول</button>
+      <button class="add" id="loginCancel" style="flex:1;background:var(--panel2);color:var(--white);">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" data-tab="matches"><span class="ic">🗓️</span>المباريات</div>
+  <div class="tab" data-tab="standings"><span class="ic">🏆</span>الترتيب</div>
+  <div class="tab" data-tab="scorers"><span class="ic">⚽</span>الهدافين</div>
+  <div class="tab" data-tab="cards"><span class="ic">🟨</span>العقوبات</div>
+  <div class="tab" data-tab="attendance"><span class="ic">✅</span>الحضور</div>
+  <div class="tab" data-tab="roster"><span class="ic">👥</span>اللاعبين</div>
+  <div class="tab" data-tab="rules"><span class="ic">📜</span>اللائحة</div>
+  <div class="tab" data-tab="motm"><span class="ic">⭐</span>رجل المباراة</div>
+  <div class="tab" data-tab="settings" id="settingsTab" style="display:none;"><span class="ic">⚙️</span>الإعدادات</div>
+</div>
+
+<div id="matches" class="tabpage"></div>
+<div id="standings" class="tabpage" style="display:none"></div>
+<div id="scorers" class="tabpage" style="display:none"></div>
+<div id="cards" class="tabpage" style="display:none"></div>
+<div id="attendance" class="tabpage" style="display:none"></div>
+<div id="roster" class="tabpage" style="display:none"></div>
+<div id="rules" class="tabpage" style="display:none"></div>
+<div id="motm" class="tabpage" style="display:none"></div>
+<div id="settings" class="tabpage" style="display:none"></div>
+
+<script>
+const TEAMS = [
+  {name:"المزاريطة", color:"var(--green)"},
+  {name:"المشاغبين", color:"var(--blue)"},
+  {name:"خليها على الله", color:"var(--yellow)"},
+  {name:"المدفعجية", color:"var(--red)"}
+];
+// Fixtures are defined by TEAM INDEX (not name) so that renaming a team
+// never breaks the round-robin schedule — the name is resolved live via TEAMS[idx].name.
+const FIXTURE_INDEXES = [
+  [0,1], [2,3], [0,2], [1,3], [0,3], [1,2]
+];
+function fixtureFor(i){
+  const [ia, ib] = FIXTURE_INDEXES[i % FIXTURE_INDEXES.length];
+  return { a: TEAMS[ia].name, b: TEAMS[ib].name };
+}
+const DEFAULT_ROSTER = {
+  "المزاريطة": ["ش سعيد","أبو عمار","حسن مسعد","عطية","ثروت","عبده عنبة","إبراهيم"],
+  "المشاغبين": ["إسلام صابر","محمد فيديو","أحمد زيزو","محمد زغابة","علي طلال","محمود عزت","محمد مسعد"],
+  "خليها على الله": ["عمرو","أحمد سيكا","علي ويكا","عمرو سمير","عوض","محمود صبحي","أحمد علام"],
+  "المدفعجية": ["سيد","محمد عبدالستار","رضا أبو السعود","مصطفى","صابر","يوسف","أحمد بيج شو"]
+};
+const DEFAULT_ADMIN_PASSWORD_HASH = "c1f330d0aff31c1c87403f1e4347bcc21aff7c179908723535f2b31723702525"; // SHA-256 hash of the original password — not readable in the file's source
+const DEFAULT_STATE = { matchdays: {}, scorers: [], cards: [], extraMatches: {}, roster: JSON.parse(JSON.stringify(DEFAULT_ROSTER)), teamNames: TEAMS.map(t=>t.name), adminPasswordHash: DEFAULT_ADMIN_PASSWORD_HASH };
+// Applies state.teamNames (persisted, shared) onto the live TEAMS array — keeps color/index fixed, name editable.
+function syncTeamNamesFromState(){
+  if(!state.teamNames || state.teamNames.length !== TEAMS.length) state.teamNames = TEAMS.map(t=>t.name);
+  TEAMS.forEach((t,i)=>{ t.name = state.teamNames[i]; });
+}
+let visibleDays = 4; // starts showing next 4 playing days (2 matches each = 8 matches / ~2 weeks)
+let editingCard = null; // index of violation row currently being edited (client-side only)
+
+// Matchdays run automatically every Saturday & Tuesday, forever — no manual scheduling needed.
+// Anchored to a FIXED league start date (not "today") so a matchday's index always maps to the
+// same calendar date no matter when the app is opened — fixes scores appearing to "shift" or duplicate.
+const LEAGUE_START_DATE = (()=>{ const d = new Date(2026,8,15); d.setHours(0,0,0,0); return d; })(); // الثلاثاء 15 سبتمبر 2026
+function matchdayDate(index){
+  const d = new Date(LEAGUE_START_DATE);
+  let count = -1;
+  while(count < index){
+    if(d.getDay()===6 || d.getDay()===2) count++;
+    if(count===index) break;
+    d.setDate(d.getDate()+1);
+  }
+  return d;
+}
+function fmtDate(d){
+  return new Intl.DateTimeFormat('ar-EG',{weekday:'long', day:'numeric', month:'long'}).format(d);
+}
+function isPast(d){ const t=new Date(); t.setHours(0,0,0,0); return d.getTime() < t.getTime(); }
+function isToday(d){ const t=new Date(); t.setHours(0,0,0,0); return d.getTime() === t.getTime(); }
+let state = JSON.parse(JSON.stringify(DEFAULT_STATE));
+function playerSelectOptions(){
+  return '<option value="">— اختر اللاعب —</option>' + Object.entries(state.roster).map(([team,ps])=>
+    `<optgroup label="${team}">${ps.map(p=>`<option value="${p}|${team}">${p}</option>`).join('')}</optgroup>`
+  ).join('');
+}
+async function sha256(text){
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+let isAdmin = sessionStorage.getItem('khamasy-admin') === '1';
+function updateAdminUI(){
+  document.getElementById('adminStatus').style.display = isAdmin ? 'none' : 'inline';
+  document.getElementById('adminBtn').textContent = isAdmin ? '🔓 خروج اللجنة' : '🔒 دخول اللجنة';
+  document.getElementById('backupBar').style.display = isAdmin ? 'block' : 'none';
+  const st = document.getElementById('settingsTab');
+  st.style.display = isAdmin ? 'flex' : 'none';
+  if(!isAdmin && st.classList.contains('active')){
+    st.classList.remove('active');
+    document.querySelector('.tab[data-tab="matches"]').classList.add('active');
+    document.querySelectorAll('.tabpage').forEach(p=>p.style.display='none');
+    document.getElementById('matches').style.display='block';
+  }
+}
+document.getElementById('exportBtn').addEventListener('click', ()=>{
+  const blob = new Blob([JSON.stringify(state, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'khamasy-backup-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+});
+document.getElementById('importBtn').addEventListener('click', ()=>{
+  document.getElementById('importFile').click();
+});
+document.getElementById('importFile').addEventListener('change', e=>{
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = async ()=>{
+    try{
+      const loaded = JSON.parse(reader.result);
+      state = Object.assign({}, DEFAULT_STATE, loaded);
+      if(!state.matchdays) state.matchdays = {};
+      if(!state.roster) state.roster = JSON.parse(JSON.stringify(DEFAULT_ROSTER));
+      syncTeamNamesFromState();
+      const ok = await save();
+      if(ok) renderAll();
+    }catch(err){ showToast('⚠️ الملف غير صالح', false); }
+  };
+  reader.readAsText(file);
+});
+document.getElementById('adminBtn').addEventListener('click', ()=>{
+  if(isAdmin){
+    isAdmin = false; sessionStorage.removeItem('khamasy-admin');
+    updateAdminUI(); renderAll();
+  } else {
+    document.getElementById('loginErr').style.display = 'none';
+    document.getElementById('loginInput').value = '';
+    document.getElementById('loginModal').style.display = 'flex';
+    document.getElementById('loginInput').focus();
+  }
+});
+document.getElementById('loginCancel').addEventListener('click', ()=>{
+  document.getElementById('loginModal').style.display = 'none';
+});
+async function tryLogin(){
+  const p = document.getElementById('loginInput').value;
+  const hash = await sha256(p);
+  if(hash === (state.adminPasswordHash || DEFAULT_ADMIN_PASSWORD_HASH)){
+    isAdmin = true; sessionStorage.setItem('khamasy-admin','1');
+    document.getElementById('loginModal').style.display = 'none';
+    updateAdminUI(); renderAll();
+  } else {
+    document.getElementById('loginErr').style.display = 'block';
+  }
+}
+document.getElementById('loginOk').addEventListener('click', tryLogin);
+document.getElementById('loginInput').addEventListener('keydown', e=>{
+  if(e.key === 'Enter') tryLogin();
+});
+const VIOLATION_RULES = {
+  "اعتراض": {label:"إنذار", cls:"warn"},
+  "تكرار اعتراض": {label:"إيقاف مباراة", cls:"susp"},
+  "سب أو إهانة": {label:"إيقاف مباراة أو أكثر", cls:"susp"},
+  "عنف متعمد": {label:"إيقاف مشدد / استبعاد", cls:"susp"}
+};
+
+const JSONBIN_ID = '6aa66cecffd5d1605300e926';
+const JSONBIN_KEY = '$2a$10$CoAkOrjnYGUvPxqAlIXXeOi59jn6brXMDWmyxELfJEWx0wjC8lhhi';
+const JSONBIN_URL = 'https://api.jsonbin.io/v3/b/' + JSONBIN_ID;
+
+async function load(){
+  try{
+    const res = await fetch(JSONBIN_URL + '/latest', { headers: { 'X-Master-Key': JSONBIN_KEY } });
+    if(res.ok){
+      const data = await res.json();
+      const loaded = data.record;
+      state = Object.assign({}, DEFAULT_STATE, loaded);
+      if(!state.matchdays) state.matchdays = {};
+      if(!state.roster) state.roster = JSON.parse(JSON.stringify(DEFAULT_ROSTER));
+      if(!state.extraMatches || Array.isArray(state.extraMatches)) state.extraMatches = {};
+      syncTeamNamesFromState();
+    }
+  }catch(e){}
+  if(!state.matchdays) state.matchdays = {};
+  renderAll();
+}
+async function save(){
+  try{
+    const res = await fetch(JSONBIN_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_KEY },
+      body: JSON.stringify(state)
+    });
+    showToast(res.ok ? '✅ تم الحفظ' : '⚠️ فشل الحفظ', res.ok);
+    return res.ok;
+  }catch(e){
+    showToast('⚠️ فشل الحفظ — ' + (e.message||'خطأ'), false);
+    return false;
+  }
+}
+let toastTimer;
+function showToast(msg, ok){
+  let t = document.getElementById('toast');
+  if(!t){
+    t = document.createElement('div');
+    t.id = 'toast';
+    t.style.cssText = 'position:fixed;top:12px;left:50%;transform:translateX(-50%);z-index:100;'
+      + 'padding:9px 18px;border-radius:20px;font-size:12.5px;font-weight:bold;'
+      + 'box-shadow:0 4px 14px rgba(0,0,0,.4);transition:opacity .2s;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.background = ok ? 'rgba(34,197,94,.95)' : 'rgba(239,68,68,.95)';
+  t.style.color = '#0B1120';
+  t.style.opacity = '1';
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>{ t.style.opacity = '0'; }, 1800);
+}
+
+function teamColor(name){ const t=TEAMS.find(x=>x.name===name); return t?t.color:"var(--muted)"; }
+
+function getMatchday(i){
+  if(!state.matchdays[i]){
+    const f = fixtureFor(i);
+    state.matchdays[i] = {sa:null, sb:null, motm:"", att:{}, a:f.a, b:f.b};
+  }
+  if(!state.matchdays[i].a){ // backward-compat for matchdays saved before teams were editable
+    const f = fixtureFor(i);
+    state.matchdays[i].a = f.a; state.matchdays[i].b = f.b;
+  }
+  return state.matchdays[i];
+}
+
+function attendanceList(i, team, md){
+  const rows = state.roster[team].map(p=>{
+    const st = md.att[p] || 'unset';
+    const editable = isAdmin || p === myName;
+    if(!editable){
+      const label = st==='in' ? '<span style="color:var(--green);font-size:12px;font-weight:bold;">✓ حاضر</span>'
+        : st==='out' ? '<span style="color:var(--red);font-size:12px;font-weight:bold;">✕ غايب</span>'
+        : '<span style="color:var(--muted);font-size:12px;">— لسه محددش</span>';
+      return `<div class="att-row"><span class="att-name">${p}</span>${label}</div>`;
+    }
+    return `<div class="att-row">
+      <span class="att-name">${p}</span>
+      <div class="att-btns">
+        <button class="att-btn in ${st==='in'?'on':''}" data-i="${i}" data-p="${p}" data-v="in">✓ حضور</button>
+        <button class="att-btn out ${st==='out'?'on':''}" data-i="${i}" data-p="${p}" data-v="out">✕ غياب</button>
+      </div>
+    </div>`;
+  }).join('');
+  const inCount = state.roster[team].filter(p=>md.att[p]==='in').length;
+  const outCount = state.roster[team].filter(p=>md.att[p]==='out').length;
+  return `<div style="margin-bottom:8px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;">
+      <span style="font-weight:bold;font-size:12.5px;"><span class="dot" style="background:${teamColor(team)}"></span>${team}</span>
+      <span class="att-summary">✓ ${inCount} &nbsp; ✕ ${outCount}</span>
+    </div>
+    ${rows}
+  </div>`;
+}
+
+function renderMatches(){
+  const el = document.getElementById('matches');
+  let html = '';
+  for(let day=0; day<visibleDays; day++){
+    const date = matchdayDate(day);
+    const dateStyle = isToday(date) ? 'color:var(--gold);' : isPast(date) ? 'color:var(--muted);' : 'color:var(--white);';
+    html += `<div style="text-align:center;font-weight:bold;font-size:13px;margin:14px 0 8px;${dateStyle}">📅 ${fmtDate(date)}</div>`;
+    for(let slot=0; slot<2; slot++){
+      const i = day*2 + slot; // global match index — stable id for storage
+      const md = getMatchday(i);
+      const teamOpts = TEAMS.map(t=>`<option value="${t.name}">${t.name}</option>`).join('');
+      const playerOpts = ['<option value="">— رجل المباراة —</option>']
+        .concat([md.a,md.b].flatMap(team=> state.roster[team].map(p=>
+          `<option value="${p}" ${md.motm===p?'selected':''}>${p} (${team})</option>`)))
+        .join('');
+      const dis = isAdmin ? '' : 'disabled';
+      html += `<div class="card">
+        <div class="match-teams">
+          ${isAdmin ? `
+            <select class="team-pick" data-i="${i}" data-side="a" style="width:auto;font-weight:bold;">
+              ${TEAMS.map(t=>`<option value="${t.name}" ${t.name===md.a?'selected':''}>${t.name}</option>`).join('')}
+            </select>
+            <span class="dash">ضد</span>
+            <select class="team-pick" data-i="${i}" data-side="b" style="width:auto;font-weight:bold;">
+              ${TEAMS.map(t=>`<option value="${t.name}" ${t.name===md.b?'selected':''}>${t.name}</option>`).join('')}
+            </select>
+          ` : `
+            <span><span class="dot" style="background:${teamColor(md.a)}"></span>${md.a}</span>
+            <span class="dash">ضد</span>
+            <span>${md.b}<span class="dot" style="background:${teamColor(md.b)}"></span></span>
+          `}
+        </div>
+        <div class="score-row">
+          <input type="number" min="0" ${dis} data-i="${i}" data-side="sa" value="${md.sa??''}">
+          <span style="color:var(--muted)">-</span>
+          <input type="number" min="0" ${dis} data-i="${i}" data-side="sb" value="${md.sb??''}">
+          ${isAdmin ? `<button class="add save-btn" data-i="${i}" style="padding:6px 12px;font-size:12px;">💾 حفظ</button>` : ''}
+        </div>
+        ${(isAdmin || md.motm) ? `<div class="motm-row">⭐ ${isAdmin
+            ? `<select data-i="${i}" data-side="motm">${playerOpts}</select>`
+            : `<span>رجل المباراة: <b>${md.motm||'—'}</b></span>`}</div>` : ''}
+      </div>`;
+    }
+    html += renderExtraMatchesSection(day);
+  }
+  html += `<div style="text-align:center;margin-top:6px;">
+    <span id="loadMore" style="color:var(--gold);font-size:13px;cursor:pointer;font-weight:bold;">عرض المزيد ⬇️</span>
+  </div>`;
+  el.innerHTML = html;
+
+  document.getElementById('loadMore').addEventListener('click', ()=>{
+    visibleDays += 3; renderMatches(); renderAttendance();
+  });
+  if(isAdmin){
+    el.querySelectorAll('.att-btn').forEach(btn=> btn.addEventListener('click', e=>{
+      const i = +e.currentTarget.dataset.i, p = e.currentTarget.dataset.p, v = e.currentTarget.dataset.v;
+      const md = getMatchday(i);
+      md.att[p] = (md.att[p] === v) ? 'unset' : v; // click again to clear
+      save(); renderMatches();
+    }));
+  }
+  if(!isAdmin) return;
+  el.querySelectorAll('input[type=number]').forEach(inp=>{
+    inp.addEventListener('input', e=>{
+      const i=+e.target.dataset.i, side=e.target.dataset.side;
+      const v = e.target.value === '' ? null : Math.max(0, parseInt(e.target.value)||0);
+      getMatchday(i)[side] = v;
+      renderStandings();
+    });
+  });
+  el.querySelectorAll('.save-btn').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      const i = +e.target.dataset.i;
+      const card = e.target.closest('.card');
+      const sa = card.querySelector(`input[data-side="sa"]`).value;
+      const sb = card.querySelector(`input[data-side="sb"]`).value;
+      getMatchday(i).sa = sa === '' ? null : Math.max(0, parseInt(sa)||0);
+      getMatchday(i).sb = sb === '' ? null : Math.max(0, parseInt(sb)||0);
+      save(); renderStandings();
+    });
+  });
+  el.querySelectorAll('select[data-side=motm]').forEach(sel=>{
+    sel.addEventListener('change', e=>{
+      getMatchday(+e.target.dataset.i).motm = e.target.value;
+      save();
+    });
+  });
+  el.querySelectorAll('.team-pick').forEach(sel=>{
+    sel.addEventListener('change', e=>{
+      const i = +e.target.dataset.i, side = e.target.dataset.side;
+      const md = getMatchday(i);
+      const other = side==='a' ? md.b : md.a;
+      if(e.target.value === other){
+        showToast('⚠️ لازم يكونوا فريقين مختلفين', false);
+        renderMatches();
+        return;
+      }
+      md[side] = e.target.value;
+      md.motm = ""; // reset man-of-the-match since teams changed
+      save(); renderMatches(); renderStandings();
+    });
+  });
+  wireExtraMatchesEvents(el);
+}
+
+function outcomeBadge(a, b, sa, sb){
+  if(sa===null || sb===null) return '';
+  if(sa>sb) return `<span class="badge ok">🟢 فوز ${a}</span>`;
+  if(sa<sb) return `<span class="badge ok">🟢 فوز ${b}</span>`;
+  return `<span class="badge warn">🟡 تعادل</span>`;
+}
+
+function renderExtraMatchesSection(day){
+  const teamOpts = TEAMS.map(t=>`<option>${t.name}</option>`).join('');
+  const list = state.extraMatches[day] || [];
+  const dis = isAdmin ? '' : 'disabled';
+  const rows = list.map((m,idx)=>`
+    <div class="card">
+      <div class="match-teams">
+        <span><span class="dot" style="background:${teamColor(m.a)}"></span>${m.a}</span>
+        <span class="dash">ضد</span>
+        <span>${m.b}<span class="dot" style="background:${teamColor(m.b)}"></span></span>
+      </div>
+      <div class="score-row">
+        <input type="number" min="0" ${dis} class="ex-score" data-day="${day}" data-idx="${idx}" data-side="sa" value="${m.sa??''}">
+        <span style="color:var(--muted)">-</span>
+        <input type="number" min="0" ${dis} class="ex-score" data-day="${day}" data-idx="${idx}" data-side="sb" value="${m.sb??''}">
+        ${isAdmin ? `<button class="add ex-save" data-day="${day}" data-idx="${idx}" style="padding:6px 12px;font-size:12px;">💾 حفظ</button>
+        <span class="del ex-remove" data-day="${day}" data-idx="${idx}">🗑️</span>` : ''}
+      </div>
+      <div style="text-align:center;margin-top:4px;">${outcomeBadge(m.a, m.b, m.sa, m.sb)}</div>
+    </div>`).join('');
+  return `<div style="margin:10px 0;">
+    ${rows}
+    ${isAdmin ? `<div class="addform">
+      <select id="ex-a-${day}">${teamOpts}</select>
+      <select id="ex-b-${day}">${teamOpts}</select>
+      <button class="add ex-add" data-day="${day}">➕ مباراة إضافية (${list.length})</button>
+    </div>` : (list.length ? '' : '')}
+  </div>`;
+}
+
+function wireExtraMatchesEvents(el){
+  el.querySelectorAll('.ex-add').forEach(btn=> btn.addEventListener('click', e=>{
+    const day = +e.target.dataset.day;
+    const a = document.getElementById('ex-a-'+day).value, b = document.getElementById('ex-b-'+day).value;
+    if(a === b){ showToast('⚠️ اختار فريقين مختلفين', false); return; }
+    if(!state.extraMatches[day]) state.extraMatches[day] = [];
+    state.extraMatches[day].push({a, b, sa:null, sb:null});
+    save(); renderMatches(); renderStandings();
+  }));
+  el.querySelectorAll('.ex-score').forEach(inp=> inp.addEventListener('input', e=>{
+    const day=+e.target.dataset.day, idx=+e.target.dataset.idx, side=e.target.dataset.side;
+    state.extraMatches[day][idx][side] = e.target.value===''? null : Math.max(0, parseInt(e.target.value)||0);
+    renderStandings();
+  }));
+  el.querySelectorAll('.ex-save').forEach(btn=> btn.addEventListener('click', e=>{
+    save(); renderMatches(); renderStandings();
+  }));
+  el.querySelectorAll('.ex-remove').forEach(btn=> btn.addEventListener('click', e=>{
+    const day=+e.target.dataset.day, idx=+e.target.dataset.idx;
+    state.extraMatches[day].splice(idx,1); save(); renderMatches(); renderStandings();
+  }));
+}
+
+function computeStandings(){
+  const stats = {};
+  TEAMS.forEach(t=> stats[t.name] = {name:t.name, p:0,w:0,d:0,l:0,gf:0,ga:0,pts:0});
+  function apply(a, b, sa, sb){
+    if(sa===null || sb===null || !stats[a] || !stats[b]) return;
+    const A=stats[a], B=stats[b];
+    A.p++; B.p++; A.gf+=sa; A.ga+=sb; B.gf+=sb; B.ga+=sa;
+    if(sa>sb){A.w++;A.pts+=3;B.l++;}
+    else if(sa<sb){B.w++;B.pts+=3;A.l++;}
+    else {A.d++;B.d++;A.pts++;B.pts++;}
+  }
+  Object.entries(state.matchdays).forEach(([i,m])=>{
+    const f = fixtureFor(i);
+    apply(m.a || f.a, m.b || f.b, m.sa, m.sb);
+  });
+  Object.values(state.extraMatches||{}).forEach(list=>
+    (list||[]).forEach(m=> apply(m.a, m.b, m.sa, m.sb)));
+  return Object.values(stats).sort((x,y)=> y.pts-x.pts || (y.gf-y.ga)-(x.gf-x.ga) || y.gf-x.gf);
+}
+
+function renderStandings(){
+  const rows = computeStandings();
+  document.getElementById('standings').innerHTML = `
+    ${isAdmin ? `<div class="card" style="display:flex;justify-content:flex-end;">
+      <span class="add" id="resetStandingsBtn" style="padding:7px 14px;font-size:12px;cursor:pointer;">🔄 تصفير الترتيب</span>
+    </div>` : ''}
+    <div class="card" style="padding:0;overflow:hidden;">
+    <table>
+      <tr><th>#</th><th>الفريق</th><th>لعب</th><th>فوز</th><th>تعادل</th><th>خسارة</th><th>له</th><th>عليه</th><th>فارق</th><th>نقاط</th></tr>
+      ${rows.map((r,i)=>`<tr>
+        <td>${i+1}</td>
+        <td><span class="dot" style="background:${teamColor(r.name)}"></span>${r.name}</td>
+        <td>${r.p}</td><td>${r.w}</td><td>${r.d}</td><td>${r.l}</td>
+        <td>${r.gf}</td><td>${r.ga}</td><td>${r.gf-r.ga}</td><td><b>${r.pts}</b></td>
+      </tr>`).join('')}
+    </table></div>`;
+  if(isAdmin){
+    document.getElementById('resetStandingsBtn').addEventListener('click', ()=>{
+      if(!confirm('متأكد إنك عايز تصفّر الترتيب؟ هيتمسح كل نتايج المباريات (الأساسية والإضافية) ومينفعش يترجع تاني.')) return;
+      Object.values(state.matchdays).forEach(md=>{ md.sa = null; md.sb = null; });
+      Object.values(state.extraMatches||{}).forEach(list=> (list||[]).forEach(m=>{ m.sa = null; m.sb = null; }));
+      save(); renderAll();
+      showToast('✅ اتصفّر الترتيب', true);
+    });
+  }
+}
+
+function renderScorers(){
+  const el = document.getElementById('scorers');
+  const sorted = [...state.scorers].sort((a,b)=>b.goals-a.goals);
+  const form = isAdmin ? `<div class="addform">
+      <select id="sc-player">${playerSelectOptions()}</select>
+      <input type="number" id="sc-goals" placeholder="أهداف" min="1" value="1" style="width:70px">
+      <button class="add" id="sc-add">إضافة</button>
+    </div>` : '';
+  el.innerHTML = form + `
+    <div class="card" style="padding:0;overflow:hidden;">
+    <table>
+      <tr><th>اللاعب</th><th>الفريق</th><th>أهداف</th>${isAdmin?'<th></th>':''}</tr>
+      ${sorted.length? sorted.map(s=>{
+        const idx = state.scorers.indexOf(s);
+        return `<tr><td>${s.player}</td><td>${s.team}</td><td><b>${s.goals}</b></td>
+          ${isAdmin?`<td><span class="del" data-idx="${idx}">✕</span></td>`:''}</tr>`;
+      }).join('') : `<tr><td colspan="${isAdmin?4:3}" class="empty">لا يوجد هدافون بعد</td></tr>`}
+    </table></div>`;
+  if(!isAdmin) return;
+  document.getElementById('sc-add').addEventListener('click', ()=>{
+    const val = document.getElementById('sc-player').value;
+    if(!val) return;
+    const [player,team] = val.split('|');
+    const goals = Math.max(1, parseInt(document.getElementById('sc-goals').value)||1);
+    const existing = state.scorers.find(s=>s.player===player && s.team===team);
+    if(existing) existing.goals += goals; else state.scorers.push({player,team,goals});
+    save(); renderScorers();
+  });
+  el.querySelectorAll('.del').forEach(d=> d.addEventListener('click', e=>{
+    state.scorers.splice(+e.target.dataset.idx,1); save(); renderScorers();
+  }));
+}
+
+function renderCards(){
+  const el = document.getElementById('cards');
+  const violOpts = Object.keys(VIOLATION_RULES).map(v=>`<option>${v}</option>`).join('');
+  const byPlayer = {};
+  state.cards.forEach(c=>{
+    const key = c.player+'|'+c.team;
+    if(!byPlayer[key]) byPlayer[key] = {player:c.player, team:c.team, warnings:0, suspended:false};
+    if(c.type==='اعتراض') byPlayer[key].warnings++;
+    if(c.type!=='اعتراض') byPlayer[key].suspended = true;
+    if(byPlayer[key].warnings>=2) byPlayer[key].suspended = true;
+  });
+  const list = Object.values(byPlayer);
+  const form = isAdmin ? `<div class="addform">
+      <select id="cd-player">${playerSelectOptions()}</select>
+      <select id="cd-type">${violOpts}</select>
+      <button class="add" id="cd-add">تسجيل</button>
+    </div>` : '';
+
+  el.innerHTML = form + `
+    <div class="section-title">📋 ملخص حالة اللاعبين</div>
+    <div class="card" style="padding:0;overflow:hidden;">
+    <table>
+      <tr><th>اللاعب</th><th>الفريق</th><th>إنذارات</th><th>الحالة</th></tr>
+      ${list.length? list.map(p=>`<tr>
+        <td>${p.player}</td><td>${p.team}</td><td>${p.warnings}</td>
+        <td><span class="badge ${p.suspended?'susp':(p.warnings>0?'warn':'ok')}">
+          ${p.suspended?'موقوف':(p.warnings>0?'منذر':'طبيعي')}</span></td>
+      </tr>`).join('') : '<tr><td colspan="4" class="empty">لا توجد مخالفات مسجلة</td></tr>'}
+    </table></div>
+
+    <div class="section-title">🗒️ سجل المخالفات</div>
+    <div class="card" style="padding:0;overflow:hidden;">
+    <table>
+      <tr><th>اللاعب</th><th>المخالفة</th><th>العقوبة</th>${isAdmin?'<th></th>':''}</tr>
+      ${state.cards.length? state.cards.map((c,idx)=>{
+        const rule = VIOLATION_RULES[c.type];
+        const editMode = editingCard === idx;
+        return `<tr>
+          <td>${c.player}<br><span style="color:var(--muted);font-size:10.5px;">${c.team}</span></td>
+          <td>${editMode
+            ? `<select class="cd-edit-type" data-idx="${idx}">${Object.keys(VIOLATION_RULES).map(v=>
+                `<option ${v===c.type?'selected':''}>${v}</option>`).join('')}</select>`
+            : c.type}</td>
+          <td><span class="badge ${rule.cls}">${rule.label}</span></td>
+          ${isAdmin ? `<td style="white-space:nowrap;">
+            ${editMode
+              ? `<span class="del" style="color:var(--green);" data-act="save" data-idx="${idx}">✔ حفظ</span>
+                 <span class="del" style="margin-right:8px;" data-act="cancel" data-idx="${idx}">✕ إلغاء</span>`
+              : `<span class="del" style="color:var(--gold);" data-act="edit" data-idx="${idx}">✏️ تعديل</span>
+                 <span class="del" style="margin-right:8px;" data-act="remove" data-idx="${idx}">🗑️ رفع</span>`}
+          </td>` : ''}
+        </tr>`;
+      }).join('') : `<tr><td colspan="${isAdmin?4:3}" class="empty">لا توجد مخالفات مسجلة</td></tr>`}
+    </table></div>
+
+    <div class="card" style="margin-top:10px;font-size:12px;color:var(--muted);line-height:2;">
+      🟨 اعتراض = إنذار &nbsp;|&nbsp; إنذاران = إيقاف &nbsp;|&nbsp; سب/عنف = إيقاف مباشر
+    </div>`;
+  if(!isAdmin) return;
+  document.getElementById('cd-add').addEventListener('click', ()=>{
+    const val = document.getElementById('cd-player').value;
+    if(!val) return;
+    const [player,team] = val.split('|');
+    const type = document.getElementById('cd-type').value;
+    state.cards.push({player,team,type});
+    save(); renderCards();
+  });
+  el.querySelectorAll('[data-act]').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      const idx = +e.target.dataset.idx, act = e.target.dataset.act;
+      if(act === 'edit'){ editingCard = idx; renderCards(); }
+      else if(act === 'cancel'){ editingCard = null; renderCards(); }
+      else if(act === 'remove'){
+        state.cards.splice(idx,1); save(); renderCards();
+      } else if(act === 'save'){
+        const sel = el.querySelector(`.cd-edit-type[data-idx="${idx}"]`);
+        state.cards[idx].type = sel.value;
+        editingCard = null; save(); renderCards();
+      }
+    });
+  });
+}
+
+let myName = localStorage.getItem('khamasy-myname') || '';
+function renderAttendance(){
+  const el = document.getElementById('attendance');
+  let html = `<div class="section-title">✅ سجل الحضور والغياب</div>`;
+  html += `<div class="card" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+    <span style="font-size:12.5px;">👤 أنا: <b style="color:var(--gold);">${myName || 'لسه محددتش'}</b></span>
+    <span class="add" id="changeMyNameBtn" style="padding:6px 12px;font-size:11.5px;cursor:pointer;">${myName ? '🔄 تغيير' : 'اختر نفسك'}</span>
+  </div>
+  <div class="card" id="myNamePicker" style="display:${myName ? 'none' : 'block'};">
+    <div style="font-size:12px;color:var(--muted);margin-bottom:8px;">اختر اسمك عشان تقدر تسجّل حضورك وغيابك بنفسك. كل لاعب يقدر يحدد حالته هو بس؛ باقي اللاعبين هتشوفهم للعرض فقط.</div>
+    <select id="myNameSelect">${playerSelectOptions()}</select>
+  </div>`;
+  for(let day=0; day<visibleDays; day++){
+    const date = matchdayDate(day);
+    const dateStyle = isToday(date) ? 'color:var(--gold);' : isPast(date) ? 'color:var(--muted);' : 'color:var(--white);';
+    html += `<div style="text-align:center;font-weight:bold;font-size:13px;margin:14px 0 8px;${dateStyle}">📅 ${fmtDate(date)}</div>`;
+    for(let slot=0; slot<2; slot++){
+      const i = day*2 + slot;
+      const md = getMatchday(i);
+      html += `<div class="card">
+        <div class="match-teams" style="margin-bottom:10px;">
+          <span><span class="dot" style="background:${teamColor(md.a)}"></span>${md.a}</span>
+          <span class="dash">ضد</span>
+          <span>${md.b}<span class="dot" style="background:${teamColor(md.b)}"></span></span>
+        </div>
+        ${attendanceList(i, md.a, md)}
+        ${attendanceList(i, md.b, md)}
+      </div>`;
+    }
+  }
+  html += `<div style="text-align:center;margin-top:6px;">
+    <span id="loadMoreAtt" style="color:var(--gold);font-size:13px;cursor:pointer;font-weight:bold;">عرض المزيد ⬇️</span>
+  </div>`;
+  el.innerHTML = html;
+  document.getElementById('loadMoreAtt').addEventListener('click', ()=>{
+    visibleDays += 3; renderMatches(); renderAttendance();
+  });
+  el.querySelectorAll('.att-btn').forEach(btn=> btn.addEventListener('click', e=>{
+    const i = +e.currentTarget.dataset.i, p = e.currentTarget.dataset.p, v = e.currentTarget.dataset.v;
+    const md = getMatchday(i);
+    md.att[p] = (md.att[p] === v) ? 'unset' : v;
+    save(); renderAttendance();
+  }));
+  document.getElementById('changeMyNameBtn').addEventListener('click', ()=>{
+    const picker = document.getElementById('myNamePicker');
+    picker.style.display = picker.style.display === 'none' ? 'block' : 'none';
+  });
+  document.getElementById('myNameSelect').addEventListener('change', e=>{
+    const val = e.target.value;
+    if(!val) return;
+    myName = val.split('|')[0];
+    localStorage.setItem('khamasy-myname', myName);
+    renderAttendance();
+  });
+}
+
+function renderRoster(){
+  const el = document.getElementById('roster');
+  const teamNames = TEAMS.map(t=>t.name);
+  el.innerHTML = teamNames.map(team=>{
+    const ps = state.roster[team];
+    const otherTeams = teamNames.filter(t=>t!==team);
+    return `<div class="card">
+      <div style="font-weight:bold;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;">
+        <span><span class="dot" style="background:${teamColor(team)}"></span>${team}</span>
+        ${isAdmin ? `<span class="del rt-rename-team" data-team="${team}" style="color:var(--gold);font-size:12px;">✏️ تعديل الاسم</span>` : ''}
+      </div>
+      ${ps.map(p=>`<div class="att-row">
+        <span class="att-name">${p}</span>
+        ${isAdmin ? `<div class="att-btns">
+          <span class="del rt-rename-player" data-team="${team}" data-player="${p}" style="padding:4px 6px;color:var(--gold);">✏️</span>
+          <select class="rt-move" data-team="${team}" data-player="${p}" style="width:auto;padding:4px 6px;font-size:11px;">
+            <option value="">نقل إلى...</option>
+            ${otherTeams.map(t=>`<option value="${t}">${t}</option>`).join('')}
+          </select>
+          <span class="del" data-act="rt-remove" data-team="${team}" data-player="${p}" style="padding:4px 8px;">🗑️</span>
+        </div>` : ''}
+      </div>`).join('')}
+      ${isAdmin ? `<div class="addform" style="margin-top:10px;">
+        <input type="text" class="rt-newname" data-team="${team}" placeholder="اسم لاعب جديد">
+        <button class="add rt-add" data-team="${team}">+ إضافة</button>
+      </div>` : ''}
+    </div>`;
+  }).join('');
+  if(!isAdmin) return;
+
+  el.querySelectorAll('.rt-add').forEach(btn=> btn.addEventListener('click', e=>{
+    const team = e.target.dataset.team;
+    const input = el.querySelector(`.rt-newname[data-team="${team}"]`);
+    const name = input.value.trim();
+    if(!name) return;
+    if(state.roster[team].includes(name)){ showToast('⚠️ اللاعب موجود بالفعل', false); return; }
+    state.roster[team].push(name);
+    save(); renderRoster(); renderScorers(); renderCards(); renderMatches(); renderAttendance();
+  }));
+  el.querySelectorAll('[data-act="rt-remove"]').forEach(btn=> btn.addEventListener('click', e=>{
+    const team = e.target.dataset.team, player = e.target.dataset.player;
+    state.roster[team] = state.roster[team].filter(p=>p!==player);
+    save(); renderRoster(); renderScorers(); renderCards(); renderMatches(); renderAttendance();
+  }));
+  el.querySelectorAll('.rt-move').forEach(sel=> sel.addEventListener('change', e=>{
+    const fromTeam = e.target.dataset.team, player = e.target.dataset.player, toTeam = e.target.value;
+    if(!toTeam) return;
+    state.roster[fromTeam] = state.roster[fromTeam].filter(p=>p!==player);
+    if(!state.roster[toTeam].includes(player)) state.roster[toTeam].push(player);
+    showToast(`✅ اتنقل ${player} إلى ${toTeam}`, true);
+    save(); renderRoster(); renderScorers(); renderCards(); renderMatches(); renderAttendance();
+  }));
+  el.querySelectorAll('.rt-rename-team').forEach(btn=> btn.addEventListener('click', e=>{
+    const oldName = e.target.dataset.team;
+    const newName = (prompt('الاسم الجديد للفريق:', oldName) || '').trim();
+    if(!newName || newName === oldName) return;
+    if(TEAMS.some(t=>t.name===newName)){ showToast('⚠️ فيه فريق تاني بنفس الاسم', false); return; }
+    renameTeam(oldName, newName);
+    showToast(`✅ اتغير اسم الفريق إلى ${newName}`, true);
+    save(); renderAll();
+  }));
+  el.querySelectorAll('.rt-rename-player').forEach(btn=> btn.addEventListener('click', e=>{
+    const team = e.target.dataset.team, oldName = e.target.dataset.player;
+    const newName = (prompt('الاسم الجديد للاعب:', oldName) || '').trim();
+    if(!newName || newName === oldName) return;
+    if(state.roster[team].includes(newName)){ showToast('⚠️ فيه لاعب تاني بنفس الاسم في الفريق', false); return; }
+    renamePlayer(team, oldName, newName);
+    showToast(`✅ اتغير اسم اللاعب إلى ${newName}`, true);
+    save(); renderAll();
+  }));
+}
+
+// Renames a team everywhere it's referenced in state (roster key, matchdays, extra matches, cards, scorers).
+// TEAMS[i].name is mutated in place so colors and the round-robin schedule (index-based) stay correct.
+function renameTeam(oldName, newName){
+  const t = TEAMS.find(x=>x.name===oldName);
+  if(t) t.name = newName;
+  const tnIdx = state.teamNames.indexOf(oldName);
+  if(tnIdx > -1) state.teamNames[tnIdx] = newName;
+  if(state.roster[oldName]){
+    state.roster[newName] = state.roster[oldName];
+    delete state.roster[oldName];
+  }
+  Object.values(state.matchdays).forEach(md=>{
+    if(md.a===oldName) md.a = newName;
+    if(md.b===oldName) md.b = newName;
+  });
+  Object.values(state.extraMatches||{}).forEach(list=>{
+    (list||[]).forEach(m=>{
+      if(m.a===oldName) m.a = newName;
+      if(m.b===oldName) m.b = newName;
+    });
+  });
+  state.cards.forEach(c=>{ if(c.team===oldName) c.team = newName; });
+  state.scorers.forEach(s=>{ if(s.team===oldName) s.team = newName; });
+}
+
+// Renames a player everywhere it's referenced in state (roster, attendance, man-of-the-match, cards, scorers).
+function renamePlayer(team, oldName, newName){
+  const idx = state.roster[team].indexOf(oldName);
+  if(idx > -1) state.roster[team][idx] = newName;
+  Object.values(state.matchdays).forEach(md=>{
+    if(md.att && Object.prototype.hasOwnProperty.call(md.att, oldName)){
+      md.att[newName] = md.att[oldName];
+      delete md.att[oldName];
+    }
+    if(md.motm === oldName) md.motm = newName;
+  });
+  state.cards.forEach(c=>{ if(c.player===oldName && c.team===team) c.player = newName; });
+  state.scorers.forEach(s=>{ if(s.player===oldName && s.team===team) s.player = newName; });
+}
+
+function renderRules(){
+  const el = document.getElementById('rules');
+  const teamRows = TEAMS.map(t=>
+    `<tr><td><span class="dot" style="background:${t.color}"></span>${t.name}</td><td>${(state.roster[t.name]||[]).length} لاعبين</td></tr>`
+  ).join('');
+  const violRows = Object.entries(VIOLATION_RULES).map(([k,v])=>
+    `<tr><td>${k}</td><td><span class="badge ${v.cls}">${v.label}</span></td></tr>`
+  ).join('');
+  el.innerHTML = `
+    <div class="section-title">📜 لائحة دوري كرة القدم الخماسية</div>
+
+    <div class="section-title" style="font-size:13px;margin-top:14px;">🏟️ الفرق</div>
+    <div class="card" style="padding:0;overflow:hidden;">
+      <table>
+        <tr><th>الفريق</th><th>عدد اللاعبين</th></tr>
+        ${teamRows}
+      </table>
+    </div>
+
+    <div class="section-title" style="font-size:13px;margin-top:14px;">🗓️ نظام الدوري</div>
+    <div class="card">
+      <table>
+        <tr><td style="text-align:right;">نظام المباريات</td><td style="text-align:left;">دوري كامل — كل فريق يقابل الباقي (6 مباريات)</td></tr>
+        <tr><td style="text-align:right;">مواعيد المباريات</td><td style="text-align:left;">كل سبت وثلاثاء</td></tr>
+      </table>
+    </div>
+
+    <div class="section-title" style="font-size:13px;margin-top:14px;">🏆 نظام النقاط والترتيب</div>
+    <div class="card" style="padding:0;overflow:hidden;">
+      <table>
+        <tr><th>النتيجة</th><th>النقاط</th></tr>
+        <tr><td>فوز</td><td><b>3</b></td></tr>
+        <tr><td>تعادل</td><td><b>1</b></td></tr>
+        <tr><td>خسارة</td><td><b>0</b></td></tr>
+      </table>
+    </div>
+    <div class="card" style="font-size:12px;color:var(--muted);line-height:2;">
+      عند تساوي النقاط، يُحتكم بالترتيب التالي:
+      1) النقاط &nbsp;2) فارق الأهداف &nbsp;3) عدد الأهداف المسجلة &nbsp;4) نتيجة المواجهة المباشرة &nbsp;5) قرار اللجنة
+    </div>
+
+    <div class="section-title" style="font-size:13px;margin-top:14px;">🟨 نظام العقوبات</div>
+    <div class="card" style="padding:0;overflow:hidden;">
+      <table>
+        <tr><th>المخالفة</th><th>العقوبة</th></tr>
+        ${violRows}
+      </table>
+    </div>
+    <div class="card" style="font-size:12px;color:var(--muted);line-height:2;">
+      إنذاران في مباراة واحدة أو أكثر = إيقاف مباشر.
+    </div>
+
+    <div class="section-title" style="font-size:13px;margin-top:14px;">👥 لجنة الدوري</div>
+    <div class="card" style="font-size:13px;line-height:2.2;">
+      الشيخ سعيد &nbsp;•&nbsp; الأستاذ محمود عزت &nbsp;•&nbsp; الشيخ عمرو &nbsp;•&nbsp; حسن عبدالعال &nbsp;•&nbsp; أبو عمار
+    </div>
+  `;
+}
+
+function renderMotm(){
+  const el = document.getElementById('motm');
+  const entries = Object.entries(state.matchdays)
+    .filter(([i,md])=> md.motm)
+    .map(([i,md])=>{
+      const f = fixtureFor(i);
+      return { i:+i, name: md.motm, date: matchdayDate(+i), a: md.a||f.a, b: md.b||f.b, sa: md.sa, sb: md.sb };
+    })
+    .sort((x,y)=> y.date - x.date);
+  const counts = {};
+  entries.forEach(e=> counts[e.name] = (counts[e.name]||0) + 1);
+  const leaderboard = Object.entries(counts).sort((a,b)=> b[1]-a[1]);
+  el.innerHTML = `
+    <div class="section-title">⭐ رجل المباراة</div>
+    ${leaderboard.length ? `
+      <div class="section-title" style="font-size:13px;">🏅 الأكثر تتويجًا</div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <table>
+          <tr><th>اللاعب</th><th>عدد المرات</th></tr>
+          ${leaderboard.map(([name,c])=>`<tr><td>${name}</td><td><b>${c}</b></td></tr>`).join('')}
+        </table>
+      </div>` : ''}
+    <div class="section-title" style="font-size:13px;margin-top:14px;">📋 سجل المباريات</div>
+    ${entries.length ? entries.map(e=>`
+      <div class="card" style="display:flex;justify-content:space-between;align-items:center;">
+        <div style="font-size:12px;color:var(--muted);">${fmtDate(e.date)}<br>${e.a} ${e.sa??'-'} : ${e.sb??'-'} ${e.b}</div>
+        <div style="font-weight:bold;">⭐ ${e.name}</div>
+      </div>`).join('') : `<div class="card empty">لسه معلش حد اتسمى رجل مباراة</div>`}
+  `;
+}
+
+function renderSettings(){
+  const el = document.getElementById('settings');
+  if(!isAdmin){ el.innerHTML = ''; return; }
+  el.innerHTML = `
+    <div class="section-title">⚙️ الإعدادات</div>
+
+    <div class="section-title" style="font-size:13px;">🔑 تغيير كلمة سر اللجنة</div>
+    <div class="card">
+      <input type="password" id="setCurPw" placeholder="كلمة السر الحالية" style="margin-bottom:8px;">
+      <input type="password" id="setNewPw" placeholder="كلمة السر الجديدة" style="margin-bottom:8px;">
+      <input type="password" id="setNewPw2" placeholder="تأكيد كلمة السر الجديدة" style="margin-bottom:8px;">
+      <div id="setPwMsg" style="font-size:11.5px;color:var(--red);display:none;margin-bottom:6px;"></div>
+      <span class="add" id="setPwBtn" style="display:block;text-align:center;padding:10px;cursor:pointer;">💾 حفظ كلمة السر الجديدة</span>
+    </div>
+
+    <div class="section-title" style="font-size:13px;margin-top:14px;">💾 نسخة احتياطية</div>
+    <div class="card" style="text-align:center;font-size:12.5px;">
+      <span id="settingsExportBtn" style="color:var(--muted);cursor:pointer;text-decoration:underline;">⬇️ تنزيل نسخة احتياطية</span>
+      &nbsp;|&nbsp;
+      <span id="settingsImportBtn" style="color:var(--muted);cursor:pointer;text-decoration:underline;">⬆️ استيراد نسخة</span>
+    </div>
+  `;
+  document.getElementById('setPwBtn').addEventListener('click', async ()=>{
+    const cur = document.getElementById('setCurPw').value;
+    const n1 = document.getElementById('setNewPw').value;
+    const n2 = document.getElementById('setNewPw2').value;
+    const msg = document.getElementById('setPwMsg');
+    const showErr = (t)=>{ msg.textContent = t; msg.style.display = 'block'; };
+    msg.style.display = 'none';
+    const curHash = await sha256(cur);
+    if(curHash !== (state.adminPasswordHash || DEFAULT_ADMIN_PASSWORD_HASH)){ showErr('كلمة السر الحالية غلط'); return; }
+    if(!n1 || n1.length < 4){ showErr('كلمة السر الجديدة لازم تكون 4 حروف/أرقام على الأقل'); return; }
+    if(n1 !== n2){ showErr('كلمة السر الجديدة والتأكيد مش متطابقين'); return; }
+    state.adminPasswordHash = await sha256(n1);
+    const ok = await save();
+    if(ok){ showToast('✅ اتغيرت كلمة السر', true); document.getElementById('setCurPw').value = document.getElementById('setNewPw').value = document.getElementById('setNewPw2').value = ''; }
+  });
+  document.getElementById('settingsExportBtn').addEventListener('click', ()=> document.getElementById('exportBtn').click());
+  document.getElementById('settingsImportBtn').addEventListener('click', ()=> document.getElementById('importBtn').click());
+}
+
+function renderAll(){ renderMatches(); renderStandings(); renderScorers(); renderCards(); renderAttendance(); renderRoster(); renderRules(); renderMotm(); renderSettings(); }
+
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    document.querySelectorAll('.tabpage').forEach(p=>p.style.display='none');
+    document.getElementById(tab.dataset.tab).style.display='block';
+  });
+});
+
+updateAdminUI();
+load();
+
+// Build a Web App Manifest at runtime (inline, single-file) so Chrome/Android
+// offers a real "Install app" / "تثبيت التطبيق" option.
+(function(){
+  const icon = 'data:image/svg+xml,' + encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">' +
+    '<rect width="100" height="100" fill="%230B1120"/>' +
+    '<text x="50" y="66" font-size="55" text-anchor="middle">🏆</text></svg>');
+  const manifest = {
+    name: "دوري كرة القدم الخماسية",
+    short_name: "دوري الخماسي",
+    start_url: location.href,
+    display: "standalone",
+    background_color: "#0B1120",
+    theme_color: "#0B1120",
+    icons: [{src: icon, sizes: "512x512", type: "image/svg+xml"}]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], {type:'application/manifest+json'});
+  document.getElementById('manifestLink').href = URL.createObjectURL(blob);
+})();
+</script>
+</div>
+</body>
+</html>
